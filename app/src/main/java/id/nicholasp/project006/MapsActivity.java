@@ -1,8 +1,11 @@
 package id.nicholasp.project006;
 
-import androidx.fragment.app.FragmentActivity;
-
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
+
+import androidx.appcompat.widget.SearchView;
+import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -11,30 +14,71 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+import java.io.IOException;
+import java.util.List;
 
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
+    SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_maps);
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        searchView = findViewById(R.id.idSearchView);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+
+                // Mendapatkan inputan lokasi
+                String location = searchView.getQuery().toString();
+
+                // Buat simpan alamat
+                List<Address> addressList = null;
+
+                // Cek apakah inputan kosong/belum di isi atau udah
+                if (location != null || location.equals("")) {
+                    // Menggunakan geocoder
+                    Geocoder geocoder = new Geocoder(MapsActivity.this);
+                    try {
+                        // Menggunakan inputan lokasi yang diketik untuk dicari menggunakan geocoder
+                        addressList = geocoder.getFromLocationName(location, 1);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    // Mendapatkan alamat
+                    Address address = addressList.get(0);
+
+                    // Mendapatkan latitude and longitude.
+                    LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+
+                    // Memberikan marker pada lokasi yang dicari.
+                    mMap.addMarker(new MarkerOptions().position(latLng).title(location));
+
+                    // Animasi kamera ke lokasi.
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
         mapFragment.getMapAsync(this);
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        // Add a marker in Sydney and move the camera
-        LatLng maybank = new LatLng(-6.226956267814199, 106.7995667543529);
-        mMap.addMarker(new MarkerOptions().position(maybank).title("Marker in Maybank"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(maybank, 15));
-
     }
 }
+
+
+
+
