@@ -15,15 +15,15 @@
     <androidx.appcompat.widget.SearchView
         android:id="@+id/idSearchView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="39dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
-        android:background="#BFBFBF"
+        android:background="#FFFFFF"
         android:elevation="5dp"
+        android:foregroundGravity="bottom"
         app:iconifiedByDefault="false"
-        app:queryHint="Search Here"
-        android:foregroundGravity="bottom"/>
+        app:queryHint="Search Here" />
 
 </RelativeLayout>
